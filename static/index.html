@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bike Energy — Local com SQLite</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <section id="loginView" class="login-shell">
+    <div class="login-card">
+      <div class="brand brand-large">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <strong>Bike Energy</strong>
+          <span>Energia que vira pontos</span>
+        </div>
+      </div>
+
+      <div class="login-copy">
+        <span class="eyebrow">VERSÃO LOCAL • UPX III • 20/10/2026</span>
+        <h1>Pedale. Gere energia. Acumule pontos.</h1>
+        <p>
+          O sistema registra a energia simulada nas bicicletas, converte kWh em pontos
+          Bike Energy e permite que a academia defina os benefícios.
+        </p>
+      </div>
+
+      <div class="login-form">
+        <form id="loginForm">
+          <h2>Acesse sua conta</h2>
+          <label>E-mail<input id="loginEmail" name="email" type="email" autocomplete="username" required maxlength="180" placeholder="aluno@bike.local" spellcheck="false" /></label>
+          <label>Senha<input id="loginPassword" name="password" type="password" autocomplete="current-password" required maxlength="128" /></label>
+          <button class="primary-btn" type="submit">Entrar no sistema</button>
+          <button id="registerToggle" class="text-btn" type="button">Criar conta de aluno</button>
+        </form>
+        <form id="registerForm" class="hidden">
+          <h2>Cadastro de aluno</h2>
+          <label>Nome completo<input id="registerName" name="name" autocomplete="name" required minlength="2" maxlength="100" /></label>
+          <label>E-mail<input id="registerEmail" name="email" type="email" autocomplete="username" required maxlength="180" spellcheck="false" /></label>
+          <label>Senha (8 a 128 caracteres)<input id="registerPassword" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" /></label>
+          <button class="primary-btn" type="submit">Cadastrar aluno</button>
+          <button id="loginToggle" class="text-btn" type="button">Voltar ao login</button>
+        </form>
+        <p id="loginError" class="error-message" role="alert"></p>
+        <div class="demo-note"><strong>Demonstração local:</strong> use os acessos em <code>data/ACESSOS_DEMO.txt</code>.
+          As contas e os registros são gravados em SQLite. A energia é simulada.</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <strong>Bike Energy</strong>
+          <span>MVP</span>
+        </div>
+      </div>
+
+      <nav id="studentNav" class="nav-list">
+        <button data-view="studentDashboard" class="nav-item active">▦ <span>Visão geral</span></button>
+        <button data-view="sessionView" class="nav-item">▶ <span>Nova sessão</span></button>
+        <button data-view="historyView" class="nav-item">◷ <span>Histórico</span></button>
+        <button data-view="benefitsView" class="nav-item">★ <span>Benefícios</span></button>
+      </nav>
+
+      <nav id="managerNav" class="nav-list hidden">
+        <button data-view="managerDashboard" class="nav-item active">▦ <span>Painel do gestor</span></button>
+        <button data-view="bikesView" class="nav-item">▤ <span>Bicicletas</span></button>
+        <button data-view="benefitsManageView" class="nav-item">★ <span>Benefícios</span></button>
+        <button data-view="redemptionsView" class="nav-item">✓ <span>Resgates</span></button>
+        <button data-view="studentsView" class="nav-item">♙ <span>Alunos</span></button>
+        <button data-view="reportView" class="nav-item">▥ <span>Relatórios</span></button>
+        <button data-view="rulesView" class="nav-item">⚙ <span>Regra de pontos</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="scope-pill">kWh → pontos → benefícios</div>
+        <button id="logoutBtn" class="ghost-btn">Sair</button>
+      </div>
+    </aside>
+
+    <main class="main" id="mainContent" tabindex="-1">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="pageEyebrow">ALUNO</p>
+          <h2 id="pageTitle">Visão geral</h2>
+        </div>
+        <div class="user-box">
+          <div class="avatar" id="avatar">CD</div>
+          <div>
+            <strong id="userName">Camila Duarte</strong>
+            <span id="userRole">Aluno</span>
+          </div>
+        </div>
+      </header>
+
+      <div id="appError" class="error-message" role="alert"></div>
+      <section id="studentDashboard" class="view">
+        <div class="hero">
+          <div>
+            <span class="hero-badge">META DE ENERGIA DO MÊS</span>
+            <h1 id="greeting">Continue pedalando!</h1>
+            <p>Energia simulada registrada em kWh. Recompensa em pontos, sem equivalência financeira direta.</p>
+          </div>
+          <div class="hero-progress">
+            <div class="progress-ring" id="progressRing">
+              <div>
+                <strong id="goalPercent">0%</strong>
+                <span>da meta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Energia simulada no mês</span>
+            <strong id="studentKwh">0,000 kWh</strong>
+            <small>energia acumulada</small>
+          </article>
+          <article class="stat-card">
+            <span>Pontos Bike Energy</span>
+            <strong id="studentPoints">0 pts</strong>
+            <small id="pointsRuleText">1 Wh = 1 ponto</small>
+          </article>
+          <article class="stat-card">
+            <span>Sessões</span>
+            <strong id="studentSessions">0</strong>
+            <small>treinos registrados</small>
+          </article>
+          <article class="stat-card">
+            <span>Tempo pedalado</span>
+            <strong id="studentMinutes">0 min</strong>
+            <small>total acumulado</small>
+          </article>
+        </div>
+
+        <form id="goalForm" class="panel compact-form">
+          <label>Meta mensal (Wh)<input id="goalInput" type="number" min="1" max="1000000" required value="500" /></label>
+          <button class="small-action" type="submit">Salvar meta</button><small>1.000 Wh = 1 kWh. Resgatar benefícios não reduz a energia da meta.</small>
+        </form>
+        <div class="two-cols">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">ÚLTIMAS SESSÕES</span>
+                <h3>Histórico recente</h3>
+              </div>
+              <button class="text-btn" data-go="historyView">Ver tudo</button>
+            </div>
+            <div id="recentSessions"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">PRÓXIMA RECOMPENSA</span>
+                <h3 id="nextBenefitName">—</h3>
+              </div>
+            </div>
+            <div class="benefit-focus">
+              <div class="big-points" id="nextBenefitPoints">0 pts</div>
+              <div class="progress-bar"><span id="benefitProgress"></span></div>
+              <p id="benefitHint">Comece uma sessão para acumular pontos.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="sessionView" class="view hidden">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">SIMULAÇÃO DO MVP</span>
+            <h1>Nova sessão de treino</h1>
+            <p>Para a demonstração, a leitura do hardware é simulada. O fluxo é o mesmo que será usado quando houver integração física.</p>
+          </div>
+        </div>
+
+        <div class="session-layout">
+          <article class="panel">
+            <h3>Dados da sessão</h3>
+
+            <label>
+              Bicicleta
+              <select id="bikeSelect"></select>
+            </label>
+
+            <div class="range-row">
+              <div>
+                <label for="wattsRange">Potência média simulada</label>
+                <small>Representa a leitura do equipamento durante o treino.</small>
+              </div>
+              <strong><span id="wattsValue">80</span> W</strong>
+            </div>
+            <input id="wattsRange" type="range" min="30" max="180" value="80" step="5" />
+
+            <div class="range-row">
+              <div>
+                <label for="minutesRange">Duração</label>
+                <small>Use um valor curto para a apresentação ou simule um treino completo.</small>
+              </div>
+              <strong><span id="minutesValue">30</span> min</strong>
+            </div>
+            <input id="minutesRange" type="range" min="5" max="60" value="30" step="5" />
+
+            <div class="formula-box">
+              <span>Cálculo</span>
+              <strong id="formulaResult">80 W × 0,5 h = 0,040 kWh</strong>
+              <small>Os pontos são calculados pela regra definida pela academia.</small>
+            </div>
+
+            <button id="finishSessionBtn" class="primary-btn">Finalizar e registrar sessão</button>
+          </article>
+
+          <article class="panel live-panel">
+            <div class="live-badge">● SIMULAÇÃO</div>
+            <div class="meter">
+              <span>Potência</span>
+              <strong><span id="liveWatts">80</span> W</strong>
+            </div>
+            <div class="meter-grid">
+              <div>
+                <span>Energia prevista</span>
+                <strong id="liveKwh">0,040 kWh</strong>
+              </div>
+              <div>
+                <span>Pontos previstos</span>
+                <strong id="livePoints">40 pts</strong>
+              </div>
+            </div>
+            <div class="bike-visual">🚴‍♀️</div>
+            <p>Na versão com hardware, esta tela receberá automaticamente a potência e a energia medidas pela bicicleta.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="historyView" class="view hidden">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">ALUNO</span>
+            <h1>Histórico de sessões</h1>
+            <p>Acompanhe tempo, potência, energia e pontos de cada treino.</p>
+          </div>
+        </div>
+        <article class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Data</th><th>Bicicleta</th><th>Tempo</th><th>Potência</th><th>Energia</th><th>Pontos</th></tr>
+              </thead>
+              <tbody id="historyTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="benefitsView" class="view hidden">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">RECOMPENSAS</span>
+            <h1>Benefícios da academia</h1>
+            <p>Os benefícios são definidos pela academia. Os pontos não representam o valor monetário dos kWh.</p>
+          </div>
+          <div class="points-chip"><span id="benefitsPoints">0</span> pts disponíveis</div>
+        </div>
+        <div id="benefitsGrid" class="benefits-grid"></div>
+        <article class="panel" style="margin-top:18px">
+          <div class="panel-head"><div><span class="eyebrow">HISTÓRICO</span><h3>Meus resgates</h3></div></div>
+          <div id="studentRedemptions"></div>
+        </article>
+      </section>
+
+      <section id="managerDashboard" class="view hidden">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">GESTÃO</span>
+            <h1>Painel da academia</h1>
+            <p>Indicadores do uso do Bike Energy e da estratégia de engajamento.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card"><span>Energia total</span><strong id="managerKwh">0,000 kWh</strong><small>todas as sessões</small></article>
+          <article class="stat-card"><span>Pontos gerados</span><strong id="managerPoints">0 pts</strong><small>programa Bike Energy</small></article>
+          <article class="stat-card"><span>Sessões</span><strong id="managerSessions">0</strong><small>registradas</small></article>
+          <article class="stat-card"><span>Bicicletas ativas</span><strong id="activeBikes">0</strong><small>disponíveis</small></article>
+        </div>
+
+        <div class="two-cols">
+          <article class="panel">
+            <div class="panel-head">
+              <div><span class="eyebrow">VISÃO GERAL</span><h3>Fluxo do sistema</h3></div>
+            </div>
+            <div class="flow">
+              <div>🚴<span>Treino</span></div><b>→</b>
+              <div>⚡<span>kWh</span></div><b>→</b>
+              <div>★<span>Pontos</span></div><b>→</b>
+              <div>🎁<span>Benefícios</span></div>
+            </div>
+            <p class="muted">A energia é registrada como dado técnico; os pontos são a regra de gamificação; os benefícios são uma decisão comercial da academia.</p>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div><span class="eyebrow">CONFIGURAÇÃO ATUAL</span><h3>Programa de pontos</h3></div>
+            </div>
+            <div class="rule-highlight">
+              <strong id="managerRule">1 ponto por Wh</strong>
+              <span>Regra demonstrativa e configurável.</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="bikesView" class="view hidden">
+        <div class="section-intro">
+          <div><span class="eyebrow">GESTÃO</span><h1>Bicicletas</h1><p>Equipamentos cadastrados para uso no Bike Energy.</p></div>
+        </div>
+        <form id="bikeForm" class="panel compact-form">
+          <label>Nome da bicicleta<input id="bikeName" required maxlength="80" placeholder="Ex.: Bike 04" /></label>
+          <button class="small-action" type="submit">Cadastrar bicicleta</button>
+        </form>
+        <div id="bikesGrid" class="bikes-grid"></div>
+      </section>
+
+      <section id="benefitsManageView" class="view hidden">
+        <div class="section-intro">
+          <div><span class="eyebrow">GESTÃO</span><h1>Configurar benefícios</h1><p>A academia decide quais recompensas estarão ligadas aos pontos.</p></div>
+        </div>
+
+        <div class="two-cols">
+          <article class="panel">
+            <h3 id="rewardFormTitle">Novo benefício</h3>
+            <label>Nome<input id="benefitNameInput" maxlength="100" required placeholder="Ex.: Avaliação física grátis" /></label>
+            <label>Pontos necessários<input id="benefitPointsInput" type="number" min="1" max="1000000" required value="200" /></label>
+            <label>Descrição<input id="benefitDescription" maxlength="300" placeholder="Ex.: Retirada na recepção" /></label>
+            <label>Estoque disponível<input id="benefitStock" type="number" min="0" max="100000" value="20" required /></label>
+            <button id="cancelBenefitEdit" class="text-btn" type="button">Limpar formulário</button>
+            <button id="addBenefitBtn" class="primary-btn">Adicionar benefício</button>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><span class="eyebrow">CATÁLOGO</span><h3>Benefícios cadastrados</h3></div></div>
+            <div id="managerBenefitsList"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="redemptionsView" class="view hidden">
+        <div class="section-intro">
+          <div>
+            <span class="eyebrow">GESTÃO</span>
+            <h1>Resgates realizados</h1>
+            <p>Acompanhe os benefícios resgatados e confirme quando o aluno retirar a recompensa.</p>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Data</th><th>Aluno</th><th>Benefício</th><th>Pontos usados</th><th>Status</th><th>Ação</th></tr>
+              </thead>
+              <tbody id="redemptionsTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="rulesView" class="view hidden">
+        <div class="section-intro">
+          <div><span class="eyebrow">GESTÃO</span><h1>Regra de conversão</h1><p>Defina quantos pontos serão gerados para cada Wh de energia.</p></div>
+        </div>
+
+        <article class="panel narrow">
+          <label>
+            Pontos por Wh
+            <input id="pointsPerWhInput" type="number" min="0.1" max="100" step="0.1" required />
+          </label>
+          <div class="formula-box">
+            <span>Exemplo</span>
+            <strong id="ruleExample">0,050 kWh = 50 pontos</strong>
+            <small>0,050 kWh corresponde a 50 Wh. A nova regra vale somente para sessões futuras; o histórico mantém a regra usada no treino.</small>
+          </div>
+          <button id="saveRuleBtn" class="primary-btn">Salvar regra</button>
+        </article>
+      </section>
+      <section id="studentsView" class="view hidden">
+        <h1>Alunos cadastrados</h1><p>Cadastros consultados diretamente no banco SQLite.</p>
+        <article class="panel"><label>Buscar por nome ou e-mail<input id="studentSearch" type="search" placeholder="Digite para filtrar…" /></label>
+          <div class="table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Saldo</th><th>Cadastro</th></tr></thead><tbody id="studentsTable"></tbody></table></div>
+        </article>
+      </section>
+      <section id="reportView" class="view hidden">
+        <h1>Relatório por período</h1><p>Consolidado da energia simulada e dos pontos gerados por aluno. Datas de Brasília.</p>
+        <form id="reportForm" class="panel compact-form">
+          <label>Data inicial<input type="date" id="reportStart" required /></label>
+          <label>Data final<input type="date" id="reportEnd" required /></label>
+          <button class="small-action" type="submit">Consultar período</button>
+          <a id="reportDownload" class="text-btn hidden" download>Baixar CSV</a>
+        </form>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Sessões</th><th>Minutos</th><th>kWh simulados</th><th>Pontos gerados</th></tr></thead><tbody id="reportTable"><tr><td colspan="5">Selecione um período e consulte.</td></tr></tbody></table></div></article>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
