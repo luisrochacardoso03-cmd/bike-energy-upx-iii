@@ -1,45 +1,24 @@
-# Bike Energy — versão local v4
+# Bike Energy — UPX III
 
-Entrega para 20/10/2026, derivada do MVP v3. Interface em português, servidor Python e banco SQLite persistente em arquivo. Sem hardware, internet, pacotes Python externos ou compilação do frontend.
+A **versão Simplificada** é a versão atual para demonstração. O aluno registra um treino simulado, recebe pontos e troca o saldo por benefícios. O gestor configura bicicletas e benefícios e confirma a retirada.
 
-## Executar no Windows / VS Code
+## Como executar no Windows
 
-1. Extraia todo o ZIP; não execute de dentro do arquivo compactado.
-2. É necessário Python 3.11 ou superior. Testado neste Windows com Python 3.15.
-3. Abra `INICIAR.bat` na pasta `bike-energy`. Alternativa no terminal do VS Code: `py -3 app.py`.
-4. Mantenha o terminal aberto e acesse **http://127.0.0.1:8040**.
-5. Abra `data/ACESSOS_DEMO.txt`: os acessos aluno/gestor e as senhas aleatórias são gerados na primeira execução.
+1. Baixe o código ou clone o repositório. Se usar o ZIP do GitHub, extraia os arquivos.
+2. Com o Python 3 instalado, abra `INICIAR.bat` ou rode `py -3 server.py` na pasta do projeto.
+3. Acesse `http://127.0.0.1:8765` e mantenha o terminal aberto.
+4. Abra `ACESSOS_DEMO.txt`, criado na primeira execução, para ver os acessos de aluno e gestor. Os botões da tela de login preenchem o e-mail.
 
-Ctrl+C encerra o servidor. Os dados permanecem em `data/bike_energy.sqlite3`. Se a porta estiver ocupada, encerre a outra instância ou use `py -3 app.py --port 8041` e acesse essa porta.
+Use o servidor Python para executar o sistema. A extensão Go Live exibe somente a interface e não executa a API. O SQLite grava os registros em `bike_energy.db`. O banco e os acessos gerados são locais.
 
-O HTML isolado não executa o sistema. O navegador consulta a API; não guarda registros de negócio no localStorage.
+## Demonstração
 
-## Mostrar o banco de dados na apresentação
+Entre como Camila e registre um treino de 80 W por 45 minutos. Na regra inicial, a sessão gera 0,060 kWh e 60 pontos. Somados aos 40 pontos de exemplo, permitem resgatar a bebida esportiva. Entre como gestor para confirmar a retirada e volte ao perfil de aluno para consultar o status.
 
-Com o site aberto, dê dois cliques em `VER_BANCO.bat`. Ele executa consultas SQL em modo somente leitura e mostra alunos, bicicletas, sessões, energia, pontos, benefícios e resgates salvos no arquivo `data/bike_energy.sqlite3`. Senhas e tokens não aparecem. O mesmo comando no terminal do VS Code é `py -3 ver_banco.py`. Após cadastrar um aluno ou concluir uma sessão no site, execute novamente para mostrar o novo registro. A tela **Gestor → Alunos/Resgates/Relatórios** também consulta esse mesmo banco.
+A interface usa HTML, CSS e JavaScript. O navegador envia requisições HTTP a `server.py`, que valida as operações e consulta ou atualiza o SQLite. A potência é simulada e os pontos são usados para resgatar benefícios, sem equivalência direta em dinheiro.
 
-## Funcionalidades e demonstração
+## Histórico
 
-A primeira execução cria dados fictícios: gestor Marcos, aluna Camila, três bicicletas (duas ativas), três benefícios e duas sessões da aluna, totalizando 93 pontos.
+`app.py`, `energy/`, `static/`, `VER_BANCO.bat` e os documentos e testes da v4 foram preservados como referência. A versão atual usa `server.py`, `index.html`, `style.css` e `app.js` na raiz. O banco da v4 usa outro esquema.
 
-- Aluno: cadastro, login, painel, meta mensal, simulação, histórico, benefícios e acompanhamento da retirada.
-- Gestor: indicadores, bicicletas, catálogo/estoque, alunos, regra de pontos, resgates, confirmação/reversão de retirada e relatório por período com CSV.
-- Regra inicial: 1 ponto por Wh. 150 W durante 60 minutos = 0,150 kWh = 150 pontos.
-- A simulação registra início/fim calculados pela duração informada; não exige esperar o treino e não mede energia real.
-- Voltar para pendente corrige a entrega: não cancela o resgate nem devolve pontos/estoque.
-
-Leia `docs/ROTEIRO.md`, `docs/ARQUITETURA.md`, `docs/ESCOPO.md` e `docs/VERIFICACAO.md` para apresentar o projeto.
-
-## Testes e dados
-
-Execute `py -3 -m unittest discover -s tests -v`. O teste JavaScript opcional usa `node tests/test_browser_logic.cjs`; Node não é necessário para usar o sistema. Os testes criam bancos isolados. No PowerShell, a variável `BIKE_TEST_ROOT` permite escolher uma pasta temporária.
-
-Para backup, encerre o servidor e copie a pasta `data` para um local privado. Para restaurar, preserve uma cópia dos dados atuais antes de substituir a pasta, com o servidor parado. Não apague o banco para reiniciar o programa. Outra demonstração independente: `py -3 app.py --data-dir data-outra-demo --port 8041`.
-
-Não publique dados ou senhas; o `.gitignore` exclui `data`. MVP destinado à execução local, sem servidor de produção, recuperação de senha, hardware ou integração financeira.
-
-GitHub: https://github.com/luisrochacardoso03-cmd/bike-energy-upx-iii
-
-Trello: https://trello.com/b/3DIoUsvE/bike-energy-upx-iii
-
-O código-fonte desta versão está no repositório indicado acima. Para executar, baixe ou clone o repositório; os dados de cada instalação são gerados localmente na primeira execução. O andamento do Trello foi atualizado em 19/10/2026.
+[Acompanhar o projeto no Trello](https://trello.com/b/3DIoUsvE/bike-energy-upx-iii)

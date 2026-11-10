@@ -1,0 +1,65 @@
+/* Estilo simples do Bike Energy */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; background: #f2f5f3; color: #20362b; }
+h1 { margin-top: 0; }
+h2 { margin-top: 0; }
+p { line-height: 1.5; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.escondido { display: none !important; }
+.logo { font-weight: bold; font-size: 24px; color: #25b975; margin-bottom: 15px; }
+.entrada { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.caixa-login { width: 100%; max-width: 440px; background: white; border: 1px solid #d9e5dd; border-radius: 14px; padding: 35px; box-shadow: 0 8px 35px #00000010; }
+.caixa-login h1 { font-size: 27px; }
+.caixa-login h2 { margin-top: 22px; font-size: 20px; }
+.caixa-login > p { color: #68786d; }
+label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 14px; }
+input, select { width: 100%; padding: 11px; background: #fff; border: 1px solid #cbd8d0; border-radius: 7px; margin-top: 6px; }
+input:focus, select:focus { outline: 2px solid #a7e6c7; }
+.botao { background: #14925b; color: white; border: none; border-radius: 7px; padding: 11px 16px; font-weight: bold; }
+.botao:hover { background: #0f7246; }
+.botao:disabled { opacity: .5; cursor: not-allowed; }
+.caixa-login .botao { width: 100%; margin-bottom: 10px; }
+.link { background: none; border: none; padding: 10px 0; color: #13754b; text-decoration: underline; }
+.contas { display: flex; gap: 8px; }
+.contas button { flex: 1; background: #eaf5ee; border: none; border-radius: 6px; padding: 10px; font-size: 12px; }
+.aviso { font-size: 13px; color: #68786d; }
+.sistema { min-height: 100vh; display: flex; }
+.menu { width: 230px; min-width: 230px; background: #18392a; color: white; min-height: 100vh; padding: 24px 14px; display: flex; flex-direction: column; }
+.menu .logo { font-size: 21px; margin-bottom: 35px; }
+.menu p { margin: 0 7px 3px; font-weight: bold; }
+.menu small { margin: 0 7px 23px; color: #9ccdb5; }
+.menu nav button { display: block; width: 100%; text-align: left; background: none; color: #d6e9de; border: none; padding: 13px 12px; border-radius: 7px; margin-bottom: 4px; }
+.menu nav button:hover, .menu nav button.ativo { background: #2d5942; color: white; }
+.botao-sair { margin-top: auto; background: none; color: white; border: 1px solid #537665; border-radius: 7px; padding: 10px; }
+.conteudo { flex: 1; max-width: 100%; padding: 28px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 23px; }
+header h1 { margin: 0; }
+.etiqueta { padding: 9px 12px; color: #187748; background: #dcf5e7; border-radius: 20px; font-size: 13px; font-weight: bold; }
+.destaque { background: linear-gradient(90deg, #1b5637, #178a52); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+.destaque h2 { margin: 0; }
+.destaque p { margin-bottom: 0; }
+.quadros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 20px; }
+.quadro { background: white; border: 1px solid #dce6df; border-radius: 10px; padding: 20px; }
+.quadro span { display: block; color: #6c7d71; font-size: 13px; margin-bottom: 9px; }
+.quadro strong { display: block; font-size: 27px; }
+.cartao { background: white; border: 1px solid #dce6df; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+.largura-media { max-width: 550px; }
+.resultado { background: #eaf9f0; border-radius: 7px; padding: 10px 15px; margin-bottom: 15px; }
+.resultado p { margin: 7px 0; }
+.tabela { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 9px; border-bottom: 1px solid #e7ede9; font-size: 13px; white-space: nowrap; }
+th { color: #647469; }
+.grade-beneficios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
+.beneficio { background: white; border: 1px solid #dce6df; border-radius: 10px; padding: 20px; }
+.beneficio h3 { margin-top: 0; }
+.beneficio strong { color: #13804c; display: block; margin-bottom: 15px; }
+.beneficio button { background: #14925b; color: white; border: none; border-radius: 6px; padding: 9px 13px; }
+.beneficio button:disabled { background: #abb8af; }
+.acao { padding: 7px 10px; background: #e3f1e9; color: #14683f; border: none; border-radius: 6px; }
+.pendente { color: #a87200; font-weight: bold; }
+.retirado { color: #14804e; font-weight: bold; }
+.mensagem { position: fixed; bottom: 20px; right: 20px; background: #193e2d; color: white; padding: 15px 20px; border-radius: 9px; box-shadow: 0 4px 15px #0002; max-width: 350px; }
+@media (max-width: 1000px) { .quadros { grid-template-columns: repeat(2, 1fr); } .grade-beneficios { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .sistema { display: block; } .menu { width: 100%; min-height: auto; } .menu nav { display: flex; flex-wrap: wrap; gap: 5px; } .menu nav button { width: auto; } .botao-sair { margin-top: 14px; } .conteudo { padding: 15px; } .quadros, .grade-beneficios { grid-template-columns: 1fr; } header { display: block; } .etiqueta { display: inline-block; } }

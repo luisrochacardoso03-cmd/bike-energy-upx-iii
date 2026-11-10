@@ -1,0 +1,93 @@
+BIKE ENERGY - VERSÃO SIMPLES (UPX III)
+=================================
+
+1. COMO ABRIR
+
+- Instale Python 3 no Windows, se ainda não tiver.
+- Extraia esta pasta do ZIP.
+- Dê dois cliques em INICIAR.bat.
+- O navegador abrirá http://127.0.0.1:8765
+- Não use o Go Live do VS Code para rodar esta versão.
+- Para encerrar, volte à janela preta e pressione Ctrl + C.
+
+2. LOGINS PARA A APRESENTAÇÃO
+
+Na primeira execução, o servidor cria ACESSOS_DEMO.txt ao lado do banco.
+Abra o arquivo para ver as contas de aluno e gestor e as senhas geradas.
+Os botões de exemplo preenchem o e-mail. Informe a senha do arquivo.
+
+Também dá para cadastrar outros alunos pela tela inicial.
+
+3. QUAIS SÃO OS ARQUIVOS
+
+index.html  = telas do programa
+style.css   = cores e aparência
+app.js      = botões, cálculos na tela e pedidos ao servidor
+server.py   = login, regras, gravações e consultas SQL
+bike_energy.db = banco SQLite, criado automaticamente ao iniciar
+INICIAR.bat = abre o sistema no Windows
+
+São apenas 4 arquivos de código, sem frameworks ou bibliotecas extras.
+
+4. COMO DEMONSTRAR AO PROFESSOR
+
+1) Entre como aluno Camila.
+2) Abra 'Novo treino' e escolha 80 W por 45 minutos.
+3) O sistema calcula 0,060 kWh e 60 pontos.
+4) Registre o treino e confira no 'Histórico'.
+5) Abra 'Benefícios' e resgate a bebida esportiva (100 pontos).
+6) Saia e entre como gestor Marcos.
+7) Abra 'Resgates' e clique em 'Confirmar retirada'.
+8) Mostre os cadastros de bicicletas e benefícios.
+9) Volte ao perfil do aluno para ver o status 'Retirado'.
+10) Feche o programa e abra novamente: os dados continuam no SQLite.
+
+Obs.: no primeiro uso a Camila já tem um treino de 40 pontos, para
+ficar fácil demonstrar um resgate com um segundo treino de 60 pontos.
+
+5. COMO EXPLICAR A ARQUITETURA
+
+Navegador (index.html + style.css + app.js)
+               |
+               | Requisições HTTP
+               v
+Servidor local (server.py em Python)
+               |
+               | Comandos SQL
+               v
+Banco de dados (bike_energy.db / SQLite)
+
+O HTML mostra as telas. O CSS dá a aparência. O JavaScript recebe
+cliques, calcula a prévia e envia pedidos. O Python verifica o login,
+confere os dados e faz INSERT, SELECT e UPDATE no SQLite.
+
+6. REGRAS DO PROJETO
+
+- O equipamento físico ainda não está conectado; os watts são simulados.
+- Cálculo: kWh = watts x minutos / 60 / 1000.
+- Regra inicial: 1 Wh de energia = 1 ponto Bike Energy.
+- Os pontos não equivalem ao valor em dinheiro da energia.
+- A academia define os benefícios e os pontos necessários.
+- O aluno faz o resgate e o gestor confirma quando entrega o benefício.
+
+7. SOBRE O BANCO
+
+SQLite é um banco de dados real, guardado no arquivo bike_energy.db.
+Você pode visualizar as tabelas pelo VS Code com uma extensão SQLite,
+mas não precisa de extensão para o programa funcionar.
+As tabelas são: users, bikes, sessions, benefits, redemptions, config.
+
+8. IMPORTANTE
+
+Esta é uma versão DIDÁTICA para demonstração local em sala.
+Não é um sistema de produção para uma academia de verdade. Não coloque
+na internet nem utilize dados reais ou senhas importantes aqui.
+
+Se quiser começar com dados limpos, feche o servidor e apague somente
+o arquivo bike_energy.db. Quando abrir de novo, o Python cria as tabelas
+e os dados de exemplo.
+
+9. VERSÃO ANTERIOR
+
+A v4 usava outro esquema de banco. Deixe o programa simplificado criar
+seu próprio bike_energy.db. Guarde o banco anterior em outra pasta.

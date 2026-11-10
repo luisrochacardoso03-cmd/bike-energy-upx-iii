@@ -3,4 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 *.sqlite3*
+*.db
+*.db-*
 ACESSOS_DEMO.txt

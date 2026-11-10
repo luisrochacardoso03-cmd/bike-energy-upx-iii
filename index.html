@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bike Energy - Projeto UPX</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Tela de entrada -->
+  <div id="entrada" class="entrada">
+    <div class="caixa-login">
+      <div class="logo">⚡ Bike Energy</div>
+      <h1>Energia que vira pontos</h1>
+      <p>Projeto UPX III - Sistema de bicicletas ergométricas</p>
+
+      <form id="formLogin">
+        <h2>Entrar</h2>
+        <label>Email<input id="emailLogin" type="email" required></label>
+        <label>Senha<input id="senhaLogin" type="password" required></label>
+        <button class="botao" type="submit">Entrar</button>
+        <div class="contas">
+          <button type="button" id="demoAluno">Preencher e-mail do aluno</button>
+          <button type="button" id="demoGestor">Preencher e-mail do gestor</button>
+        </div>
+        <button type="button" class="link" id="abrirCadastro">Cadastrar novo aluno</button>
+      </form>
+
+      <form id="formCadastro" class="escondido">
+        <h2>Criar conta de aluno</h2>
+        <label>Nome<input id="nomeCadastro" required minlength="3"></label>
+        <label>Email<input id="emailCadastro" type="email" required></label>
+        <label>Senha (mínimo 8 caracteres)<input id="senhaCadastro" type="password" minlength="8" required></label>
+        <button class="botao" type="submit">Cadastrar</button>
+        <button type="button" class="link" id="voltarLogin">Voltar para login</button>
+      </form>
+      <p class="aviso">Demonstração: os treinos são simulados, mas os dados são gravados no SQLite.</p>
+    </div>
+  </div>
+
+  <!-- Sistema -->
+  <div id="sistema" class="sistema escondido">
+    <aside class="menu">
+      <div class="logo">⚡ Bike Energy</div>
+      <p id="nomeUsuario"></p>
+      <small id="tipoUsuario"></small>
+
+      <nav id="menuAluno" class="escondido">
+        <button data-tela="inicioAluno">🏠 Início</button>
+        <button data-tela="treino">🚲 Novo treino</button>
+        <button data-tela="historico">📋 Histórico</button>
+        <button data-tela="beneficiosAluno">🎁 Benefícios</button>
+      </nav>
+
+      <nav id="menuGestor" class="escondido">
+        <button data-tela="inicioGestor">🏠 Visão geral</button>
+        <button data-tela="usuarios">👥 Usuários</button>
+        <button data-tela="bicicletas">🚲 Bicicletas</button>
+        <button data-tela="todosTreinos">📋 Treinos</button>
+        <button data-tela="beneficiosGestor">🎁 Benefícios</button>
+        <button data-tela="resgates">✅ Resgates</button>
+        <button data-tela="regras">⚙️ Pontos</button>
+      </nav>
+      <button id="sair" class="botao-sair">Sair da conta</button>
+    </aside>
+
+    <main class="conteudo">
+      <header>
+        <h1 id="titulo">Bike Energy</h1>
+        <span class="etiqueta">kWh → pontos → benefícios</span>
+      </header>
+
+      <!-- ALUNO -->
+      <section id="inicioAluno" class="tela escondido">
+        <div class="destaque">
+          <h2>Olá, <span id="primeiroNome"></span>!</h2>
+          <p>Faça um treino para gerar energia e ganhar pontos.</p>
+        </div>
+        <div class="quadros">
+          <div class="quadro"><span>Energia gerada</span><strong id="energiaAluno">0 kWh</strong></div>
+          <div class="quadro"><span>Saldo de pontos</span><strong id="saldoAluno">0</strong></div>
+          <div class="quadro"><span>Treinos realizados</span><strong id="totalTreinosAluno">0</strong></div>
+          <div class="quadro"><span>Minutos pedalados</span><strong id="tempoAluno">0</strong></div>
+        </div>
+        <div class="cartao">
+          <h3>Como funciona?</h3>
+          <p>O aluno pedala, o sistema registra a energia gerada e transforma em pontos. A academia escolhe os benefícios oferecidos.</p>
+          <p><b>Importante:</b> os pontos não representam o valor em dinheiro da energia.</p>
+        </div>
+      </section>
+
+      <section id="treino" class="tela escondido">
+        <h2>Simular sessão de treino</h2>
+        <p>Como ainda não temos bicicleta com gerador, vamos simular a potência elétrica em watts.</p>
+        <div class="cartao largura-media">
+          <form id="formTreino">
+            <label>Bicicleta<select id="bikeTreino" required></select></label>
+            <label>Potência simulada (W)<input id="watts" type="number" min="1" max="300" value="80" required></label>
+            <label>Tempo pedalado (min)<input id="minutos" type="number" min="1" max="180" value="30" required></label>
+            <div class="resultado">
+              <p>Energia prevista: <b id="previaEnergia">0,040 kWh</b></p>
+              <p>Pontos previstos: <b id="previaPontos">40</b></p>
+            </div>
+            <button class="botao" type="submit">Registrar treino no banco</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="historico" class="tela escondido">
+        <h2>Meus treinos</h2>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>Data</th><th>Bicicleta</th><th>Minutos</th><th>Watts</th><th>kWh</th><th>Pontos</th></tr></thead>
+          <tbody id="tabelaHistorico"></tbody>
+        </table></div>
+      </section>
+
+      <section id="beneficiosAluno" class="tela escondido">
+        <h2>Trocar pontos por benefícios</h2>
+        <p>Saldo atual: <b id="saldoBeneficios">0 pontos</b></p>
+        <div id="listaBeneficiosAluno" class="grade-beneficios"></div>
+        <div class="cartao">
+          <h3>Meus resgates</h3>
+          <div class="tabela"><table>
+            <thead><tr><th>Data</th><th>Benefício</th><th>Pontos gastos</th><th>Status</th></tr></thead>
+            <tbody id="resgatesAluno"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- GESTOR -->
+      <section id="inicioGestor" class="tela escondido">
+        <div class="destaque"><h2>Painel da academia</h2><p>Acompanhe os alunos, os treinos e as recompensas.</p></div>
+        <div class="quadros">
+          <div class="quadro"><span>Alunos cadastrados</span><strong id="totalUsuarios">0</strong></div>
+          <div class="quadro"><span>Bicicletas ativas</span><strong id="totalBikes">0</strong></div>
+          <div class="quadro"><span>Energia registrada</span><strong id="energiaGeral">0 kWh</strong></div>
+          <div class="quadro"><span>Resgates pendentes</span><strong id="totalPendentes">0</strong></div>
+        </div>
+      </section>
+
+      <section id="usuarios" class="tela escondido">
+        <h2>Usuários cadastrados</h2>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Perfil</th></tr></thead>
+          <tbody id="tabelaUsuarios"></tbody>
+        </table></div>
+      </section>
+
+      <section id="bicicletas" class="tela escondido">
+        <h2>Cadastro de bicicletas</h2>
+        <div class="cartao largura-media">
+          <form id="formBike" class="linha-form">
+            <label>Código<input id="codigoBike" placeholder="BK-04" required></label>
+            <label>Nome<input id="nomeBike" placeholder="Bike 04" required></label>
+            <button class="botao" type="submit">Cadastrar</button>
+          </form>
+        </div>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>Código</th><th>Nome</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaBikes"></tbody>
+        </table></div>
+      </section>
+
+      <section id="todosTreinos" class="tela escondido">
+        <h2>Treinos registrados</h2>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>Data</th><th>Aluno</th><th>Bicicleta</th><th>Minutos</th><th>kWh</th><th>Pontos</th></tr></thead>
+          <tbody id="tabelaTodosTreinos"></tbody>
+        </table></div>
+      </section>
+
+      <section id="beneficiosGestor" class="tela escondido">
+        <h2>Benefícios da academia</h2>
+        <div class="cartao largura-media">
+          <form id="formBeneficio">
+            <label>Nome do benefício<input id="nomeBeneficio" placeholder="Ex.: Isenção de matrícula" required></label>
+            <label>Pontos necessários<input id="custoBeneficio" type="number" min="1" value="150" required></label>
+            <button class="botao" type="submit">Cadastrar benefício</button>
+          </form>
+        </div>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>Benefício</th><th>Pontos</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaBeneficiosGestor"></tbody>
+        </table></div>
+      </section>
+
+      <section id="resgates" class="tela escondido">
+        <h2>Entrega dos benefícios</h2>
+        <p>Quando entregar o benefício ao aluno, clique em <b>Confirmar retirada</b>.</p>
+        <div class="cartao tabela"><table>
+          <thead><tr><th>Aluno</th><th>Benefício</th><th>Data</th><th>Pontos</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaResgates"></tbody>
+        </table></div>
+      </section>
+
+      <section id="regras" class="tela escondido">
+        <h2>Regra de conversão de pontos</h2>
+        <div class="cartao largura-media">
+          <p>O gestor decide quantos pontos cada Wh de energia gera.</p>
+          <form id="formRegra">
+            <label>Pontos por Wh<input id="pontosPorWh" type="number" min="0.1" max="100" step="0.1" required></label>
+            <button class="botao" type="submit">Salvar regra</button>
+          </form>
+          <p class="aviso">Exemplo: com 1 ponto por Wh, um treino de 0,040 kWh gera 40 pontos. Essa configuração não altera treinos antigos.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="mensagem" class="mensagem escondido"></div>
+  <script src="app.js"></script>
+</body>
+</html>
